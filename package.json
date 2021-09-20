@@ -1,0 +1,24 @@
+{
+  "name": "animal-router",
+  "version": "1.0.0",
+  "description": "let animalArray = [ { id: 1, animalName: \"dog\" }, { id: 2, animalName: \"cat\" }, { id: 3, animalName: \"hamster\" }, ];",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blentell/Animal-Router.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blentell/Animal-Router/issues"
+  },
+  "homepage": "https://github.com/blentell/Animal-Router#readme",
+  "dependencies": {
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0"
+  }
+}
