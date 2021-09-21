@@ -7,89 +7,113 @@ let animalArray = [
 	{ id: 3, animalName: "hamster" },
 ];
 
-router.get("/", function (req, res) {
-	// res.render("index");
+/* example: ?animalType=dog */
+router.get("/", function (req, res, next) {
 	let foundAnimal = null;
 	if (Object.keys(req.query).length === 0) {
-		res.json(animalArray);
+		res.json({ animals });
 	} else {
-		animalArray.forEach((animal) => {			
-			if (animal.animalName === req.query.animal) {
+		animals.forEach((animal) => {
+			if (animal.animalType === req.query.animalType.toLowerCase()) {
 				foundAnimal = animal;
-				console.log(foundAnimal);
 			}
 		});
 		if (!foundAnimal) {
-			return res.send("Animal does not exist!");
+			return res.status(404).json({ message: "Animal does not exist!" });
 		} else {
-			return res.json({ foundAnimal });
+			return res.json({ message: "success", foundAnimal });
 		}
 	}
 });
 
+/* example: /2 */
 router.get("/get-animals-by-params-id/:id", function (req, res) {
-	console.log(req.params);
-	console.log(req.params.id);
-	console.log(req.params.id);
 	let foundAnimal;
-	animalArray.forEach((team) => {
+	animals.forEach((animal) => {
 		if (animal.id === +req.params.id) {
 			foundAnimal = animal;
 		}
 	});
-
-	res.json({
-		foundTeam,
-		id: req.params.id,
-	});
-});
-
-router.get("/get-animals-by-params-name/:name", function (req, res) {
-	console.log(req.params);
-	console.log(req.params.name);
-	let foundName;
-	animalArray.forEach((animal) => {
-		if (animal.animalName === req.params.name) {
-			foundName = animal;
-		}
-	});
-	res.json({ foundName, animalName: req.params.name });
-});
-
-router.post("/", function (req, res) {
-	// res.send("post path!");
-	console.log(req.body);
-	animalArray.push(req.body);
-	res.json({ animal: animalArray });
-});
-
-router.put("/get-animals-by-params-name/:name/:newName", function (req, res) {
-	let foundAnimal = null;
-	animalArray.forEach((animal) => {
-		if (animal.animalName === req.params.name) {
-			foundAnimal = animal;
-			animal.animalName = req.params.newName;
-		}
-	});
 	if (!foundAnimal) {
-		res.send("Please check your spelling.");
+		return res.status(404).json({ message: "Index does not exist." });
 	} else {
-		res.json({ animalArray, message: "Successfully updated!" });
+		res.json({
+			foundAnimal,
+			id: req.params.id,
+		});
 	}
 });
 
-router.delete("/get-animals-by-params-name/:name", function (req, res) {
-	let foundAnimal = null;
-	animalArray.forEach((animal, index) => {
-		if (animal.animalName === req.params.name) {
-			foundAnimal = animal;
-			animalArray.splice(index, 1);
+/* example: /cat */
+router.get("/get-animals-by-params-name/:name", function (req, res) {
+	let foundName;
+	animals.forEach((animal) => {
+		if (animal.animalType === req.params.name) {
+			foundName = animal;
 		}
 	});
-	if (!foundAnimal) {
-		res.send("Please check your spelling.");
+	if (!foundName) {
+		return res.status(404).json({ message: "Index does not exist." });
 	} else {
-		res.json({ animalArray, message: "Successfully deleted!" });
+		res.json({
+			foundName,
+			animalType: req.params.name,
+		});
+	}
+});
+
+/* example: /2 */
+router.post("/create-new-animal", function (req, res) {
+	const { id, animalType } = req.body;
+
+	let duplicatedAnimal = false;
+
+	animals.forEach(function (item) {
+		if (item.animalType === animalType) {
+			duplicatedAnimal = true;
+		}
+	});
+	if (duplicatedAnimal) {
+		res
+			.status(409)
+			.json({ message: "Animal already exists! Pick another one." });
+	} else {
+		animals.push({ id, animalType });
+		res.json({ message: "animal created", animal: { id, animalType } });
+	}
+});
+
+/* example: /2/monkey */
+router.put("/update-animal/:id", function (req, res) {
+  const { id } = req.params;
+  const { animalType } = req.body;
+	let foundAnimal = false;
+	animals.forEach(function (animal) {
+		if (animal.id === +req.params.id) {
+      foundAnimal = true;
+      animal.animalType = animalType;
+		}
+	});
+	if (foundAnimal) {  
+    res.json({ message: `Animal with id:${id} updated`, animals });
+  } else {
+    res.status(404).json({ message: "ID does not exist", animals });
+  }
+});
+
+/* example: /2 */
+router.delete("/delete-animal/:id", function (req, res) {
+	let foundIndex = null;
+	animals.forEach((animal, index) => {
+		if (animal.id === +req.params.id) {
+			foundIndex = index;			
+		}
+	});
+	if (!foundIndex) {
+    res.status(409).json({ message: "ID does not exist, try again.", animals });
+	} else {
+    animals.splice(foundIndex, 1);
+    res.json({ animals, message: "Successfully deleted!" });
 	}
 });
 
